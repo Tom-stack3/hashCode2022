@@ -36,7 +36,7 @@ def parse_file(file_path):
     global projects, contributors
     contributors.clear()
     projects = []
-    with open(file_path, 'r') as f:
+    with open("./input/" + file_path, 'r') as f:
         _line = f.readline().split(' ')
         amount_of_contributors = int(_line[0])
         amount_of_projects = int(_line[1])
@@ -57,8 +57,15 @@ def parse_file(file_path):
     # sort projects by score
     projects = sorted(projects, key=lambda proj: proj.score, reverse=True)
 
-    print(f"projects: {', '.join([str(p) for p in projects])}")
-    print(f"contributors: {', '.join([str(c) for c in contributors])}")
+    # print(f"projects: {', '.join([str(p) for p in projects])}")
+    # print(f"contributors: {', '.join([str(c) for c in contributors])}")
+
+
+def find_by_name(list, _name):
+    for p in list:
+        if p.name == _name:
+            return p
+    return None
 
 
 def get_first_project():
@@ -68,29 +75,41 @@ def get_first_project():
     global projects
     temp_contributors = contributors
 
+    __MAX_LEVEL = 1000000000
+    flag = 0
+    chosen_people = []
+    chosen_project = None
+    
     for p in projects:
         flag = 0
         chosen_people = []
         for skill_name, level in p.needed_skills.items():
-            lowest_level = 1000000000
+            lowest_level = __MAX_LEVEL
             lowest_name = ""
             for c in temp_contributors:
-                current = temp_contributors[c]
+                current = c
                 if current not in chosen_people:
-                    if current.get_skill_level(skill_name) >= level:
-                        if current.get_skill_level(skill_name) < lowest_level:
-                            lowest_level = current.get_skill_level(skill_name)
+                    current_skill = current.get_skill_level(skill_name)
+                    if current_skill >= level:
+                        if current_skill < lowest_level:
+                            lowest_level = current_skill
                             lowest_name = current.name
-            if lowest_level == 1000000000:
+            # find the person whose name is lowest_name
+            lowest_person = find_by_name(temp_contributors, lowest_name)
+            chosen_people.append(lowest_person)
+            if lowest_level == __MAX_LEVEL:
                 flag = 1
                 break
-
         if flag == 0:
             chosen_project = p
-
+            i = 0
+            for skill_name in chosen_project.needed_skills.keys():
+                chosen_people[i].skills[skill_name] += 1
+                i += 1
+            projects.remove(p)
             break
-        chosen_people.append(lowest_name)
-
+    if flag == 1 or chosen_project is None:
+        return None
     return chosen_project, chosen_people
 
 
@@ -105,16 +124,20 @@ def _line_prepender(filename: str, line: str):
 
 
 def work_on_file(path: str):
-    output_path = path.rstrip(".in.txt") + \
+    output_path = "./output/" + path.rstrip(".in.txt") + \
         f"_out_{datetime.now().strftime('%H:%M:%S')}.txt"
     count_projects = 0
     with open(output_path, 'w') as f:
         while True:
             result = get_first_project()
+            # print(result)
             if result is None:
                 break
             # else
-            f.write(f"{result[0]}\n{' '.join(result[1])}\n")
+            out = ''
+            for c in result[1]:
+                out += c.name + ' '
+            f.write(f"{result[0].name}\n{out}\n")
             count_projects += 1
 
     # prepand the amount of projects planned at the begining of the file
@@ -136,8 +159,35 @@ def main():
         # parse file
         parse_file(f_path)
         # work on file
-        # work_on_file(f_path)
+        work_on_file(f_path)
 
 
 if __name__ == '__main__':
     main()
+
+
+"""
+Today and only today in Martefei Elektronika!
+Filter Aquarium
+Kirayim Electric
+Nurit Kibuy
+Mafsek Pahar
+Cabel Tlat Fazi
+Toaster Meshulashim
+Toaster Meshulashim!
+Mefatzel Hashmal Meshulash
+Timer
+Griller Hasmali
+Telefon Lahzanim
+Lahzanim
+Harzanim
+Toaster Meshulashim!
+Toaster Meshulashim!
+Fuzim
+Dagei Hashmal
+Fiordim
+Toaster Meshulashim!
+All on massive sale only until monday!
+And from tuesday to next week at 2:00 pm
+And from 3:00 pm to the rest of the year!
+"""
