@@ -75,10 +75,10 @@ def get_first_project():
     global projects
     temp_contributors = contributors
 
-    __MAX_LEVEL = 1696900000000
+    __MAX_LEVEL = 1000000000
     flag = 0
     chosen_people = []
-    chosen_project = -1
+    chosen_project = None
 
     for p in projects:
         flag = 0
@@ -101,7 +101,7 @@ def get_first_project():
 
             chosen_people.append(lowest_person)
 
-        if flag == 0 and len(chosen_people) == p.num_of_roles:
+        if flag == 0:
             chosen_project = p
             i = 0
             for skill_name in chosen_project.needed_skills.keys():
@@ -110,7 +110,11 @@ def get_first_project():
             projects.remove(chosen_project)
             break
 
-    if flag == 1 or chosen_project == -1:
+    # print(f"flag: {flag}, chosen_project: {chosen_project},")
+    # if chosen_project is not None:
+        # print(f"chosen_project.name: {chosen_project.name}")
+
+    if flag == 1:
         return None
     return chosen_project, chosen_people
 
@@ -132,7 +136,7 @@ def work_on_file(path: str):
     with open(output_path, 'w') as f:
         while True:
             result = get_first_project()
-            print(f"result: {result}")
+            # print(f"result: {result}")
             if result is None:
                 break
             # else
