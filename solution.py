@@ -75,7 +75,7 @@ def get_first_project():
     global projects
     temp_contributors = contributors
 
-    __MAX_LEVEL = 1696900000000
+    __MAX_LEVEL = 4555652212615615
     flag = 0
     chosen_people = []
     chosen_project = -1
