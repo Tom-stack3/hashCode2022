@@ -84,16 +84,17 @@ def get_first_project():
             if lowest_level == 1000000000:
                 flag = 1
                 break
+
         if flag == 0:
             chosen_project = p
-            
+
             break
         chosen_people.append(lowest_name)
 
     return chosen_project, chosen_people
 
 
-def _line_prepender(filename, line):
+def _line_prepender(filename: str, line: str):
     """
     Used for outputting.
     """
@@ -104,7 +105,8 @@ def _line_prepender(filename, line):
 
 
 def work_on_file(path: str):
-    output_path = path.rstrip(".in.txt") + f"_out_{datetime.now().strftime('%H:%M:%S')}.txt"
+    output_path = path.rstrip(".in.txt") + \
+        f"_out_{datetime.now().strftime('%H:%M:%S')}.txt"
     count_projects = 0
     with open(output_path, 'w') as f:
         while True:
@@ -115,8 +117,8 @@ def work_on_file(path: str):
             f.write(f"{result[0]}\n{' '.join(result[1])}\n")
             count_projects += 1
 
-    # prepand the amount of projects planned at the begining of the file 
-    _line_prepender(str(count_projects))
+    # prepand the amount of projects planned at the begining of the file
+    _line_prepender(output_path, str(count_projects))
 
 
 def main():
