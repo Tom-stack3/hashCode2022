@@ -57,8 +57,6 @@ def parse_file(file_path):
     # sort projects by score
     projects = sorted(projects, key=lambda proj: proj.score, reverse=True)
 
-    # print(f"projects: {', '.join([str(p) for p in projects])}")
-    # print(f"contributors: {', '.join([str(c) for c in contributors])}")
 
 
 def find_by_name(list, _name):
@@ -76,13 +74,10 @@ def _get_first_project():
     temp_contributors = contributors.copy()
 
     for p in projects:
-        print(f"Project: {p}")
         chosen_contributors = []
         is_good = True
 
         for skill_name, needed_level in p.needed_skills.items():
-            print(f"{skill_name} {needed_level}")
-
             lowest_person = None
             lowest_level = None
 
@@ -136,7 +131,6 @@ def work_on_file(path: str):
     with open(output_path, 'w') as f:
         while True:
             result = _get_first_project()
-            print(f"result: {result}")
             if result is None:
                 break
             # else
@@ -146,7 +140,7 @@ def work_on_file(path: str):
             f.write(f"{result[0].name}\n{out.rstrip()}\n")
             count_projects += 1
 
-    # prepand the amount of projects planned at the begining of the file
+    # prepend the amount of projects planned at the beginning of the file
     _line_prepender(output_path, str(count_projects))
 
 
@@ -155,8 +149,7 @@ def main():
     # if no arguments were passed
     if len(sys.argv) == 1:
         # run on all files
-        # files_to_run_on = list(_files_dict.values())
-        files_to_run_on.append(_files_dict["b"])
+        files_to_run_on = list(_files_dict.values())
     else:
         for k in sys.argv[1:]:
             files_to_run_on.append(_files_dict[k])
