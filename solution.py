@@ -68,51 +68,55 @@ def find_by_name(list, _name):
     return None
 
 
-def get_first_project():
+def _get_first_project():
     """
     Return the first project that can be completed.
     """
     global projects
-    temp_contributors = contributors
-
-    __MAX_LEVEL = 4555652212615615
-    flag = 0
-    chosen_people = []
-    chosen_project = -1
+    temp_contributors = contributors.copy()
 
     for p in projects:
-        flag = 0
-        chosen_people = []
+        print(f"Project: {p}")
+        chosen_contributors = []
+        is_good = True
 
-        for skill_name, level in p.needed_skills.items():
-            lowest_level = __MAX_LEVEL
+        for skill_name, needed_level in p.needed_skills.items():
+            print(f"{skill_name} {needed_level}")
+
             lowest_person = None
+            lowest_level = None
+
             for c in temp_contributors:
-                current = c
-                if current not in chosen_people:
-                    current_skill = current.get_skill_level(skill_name)
-                    if current_skill >= level:
-                        if current_skill < lowest_level:
-                            lowest_level = current_skill
-                            lowest_person = current
-            if lowest_level == __MAX_LEVEL:
-                flag = 1
-                break
+                # if the contributor is already working on something else in the project
+                if c in chosen_contributors:
+                    continue
 
-            chosen_people.append(lowest_person)
+                c_level = c.get_skill_level(skill_name)
+                # if qualified
+                if c_level >= needed_level:
+                    if lowest_person is None or lowest_level > c_level:
+                        lowest_person = c
+                        lowest_level = c_level
 
-        if flag == 0 and len(chosen_people) == p.num_of_roles:
-            chosen_project = p
+            # if no matching contributor was found
+            if lowest_person is None:
+                is_good = False
+            else:
+                # add the chosen contributor to the list of contributors
+                chosen_contributors.append(lowest_person)
+
+        # if the project is doable
+        if is_good:
             i = 0
-            for skill_name in chosen_project.needed_skills.keys():
-                chosen_people[i].skills[skill_name] += 1
+            for skill_name, needed_level in p.needed_skills.items():
+                # only if the contributor has the exact skill level as required
+                if chosen_contributors[i].get_skill_level(skill_name) == needed_level:
+                    # upgrade his skill level by one
+                    chosen_contributors[i].skills[skill_name] += 1
                 i += 1
-            projects.remove(chosen_project)
-            break
-
-    if flag == 1 or chosen_project == -1:
-        return None
-    return chosen_project, chosen_people
+            projects.remove(p)
+            return p, chosen_contributors
+    return None
 
 
 def _line_prepender(filename: str, line: str):
@@ -131,7 +135,7 @@ def work_on_file(path: str):
     count_projects = 0
     with open(output_path, 'w') as f:
         while True:
-            result = get_first_project()
+            result = _get_first_project()
             print(f"result: {result}")
             if result is None:
                 break
@@ -139,7 +143,7 @@ def work_on_file(path: str):
             out = ''
             for c in result[1]:
                 out += c.name + ' '
-            f.write(f"{result[0].name}\n{out}\n")
+            f.write(f"{result[0].name}\n{out.rstrip()}\n")
             count_projects += 1
 
     # prepand the amount of projects planned at the begining of the file
@@ -151,7 +155,8 @@ def main():
     # if no arguments were passed
     if len(sys.argv) == 1:
         # run on all files
-        files_to_run_on = list(_files_dict.values())
+        # files_to_run_on = list(_files_dict.values())
+        files_to_run_on.append(_files_dict["b"])
     else:
         for k in sys.argv[1:]:
             files_to_run_on.append(_files_dict[k])
