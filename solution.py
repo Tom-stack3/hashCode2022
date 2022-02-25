@@ -41,18 +41,18 @@ def parse_file(file_path):
         amount_of_contributors = int(_line[0])
         amount_of_projects = int(_line[1])
 
-        for j in range(amount_of_contributors):
+        for i in range(amount_of_contributors):
             _line = f.readline()
             c = Contributer(_line)
             contributors.add(c)
             for _ in range(c.amount_of_skills):
                 c.add_line(f.readline())
 
-        for j in range(amount_of_projects):
+        for i in range(amount_of_projects):
             _line = f.readline()
             projects.append(Project(_line))
-            for _ in range(projects[j].num_of_roles):
-                projects[j].add_line(f.readline())
+            for _ in range(projects[i].num_of_roles):
+                projects[i].add_line(f.readline())
 
     # sort projects by score
     projects = sorted(projects, key=lambda proj: proj.score, reverse=True)
@@ -78,7 +78,7 @@ def _get_first_project():
         is_good = True
 
         for skill_name, needed_level in p.needed_skills.items():
-            lowest_person = None
+            lowest_contributor = None
             lowest_level = None
 
             for c in temp_contributors:
@@ -89,16 +89,16 @@ def _get_first_project():
                 c_level = c.get_skill_level(skill_name)
                 # if qualified
                 if c_level >= needed_level:
-                    if lowest_person is None or lowest_level > c_level:
-                        lowest_person = c
+                    if lowest_contributor is None or lowest_level > c_level:
+                        lowest_contributor = c
                         lowest_level = c_level
 
             # if no matching contributor was found
-            if lowest_person is None:
+            if lowest_contributor is None:
                 is_good = False
             else:
                 # add the chosen contributor to the list of contributors
-                chosen_contributors.append(lowest_person)
+                chosen_contributors.append(lowest_contributor)
 
         # if the project is doable
         if is_good:
